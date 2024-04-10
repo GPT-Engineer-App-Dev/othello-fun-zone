@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Grid, GridItem, Circle, useMediaQuery } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Circle, useMediaQuery, Button, Text } from "@chakra-ui/react";
 
 const BOARD_SIZE = 8;
 
@@ -94,10 +94,37 @@ const Index = () => {
 
     setBoard(newBoard);
     setCurrentPlayer(opponent);
+    checkGameEnd(newBoard);
+  }
+
+  function checkGameEnd(board) {
+    const isBoardFull = board.every((row) => row.every((cell) => cell !== null));
+    const hasValidMoves = board.some((row, rowIndex) => row.some((cell, colIndex) => isValidMove(rowIndex, colIndex)));
+
+    if (isBoardFull || !hasValidMoves) {
+      const greenCount = board.flat().filter((cell) => cell === "green").length;
+      const whiteCount = board.flat().filter((cell) => cell === "white").length;
+
+      if (greenCount > whiteCount) {
+        alert("Green wins!");
+      } else if (whiteCount > greenCount) {
+        alert("White wins!");
+      } else {
+        alert("It's a tie!");
+      }
+    }
+  }
+
+  function resetGame() {
+    setBoard(initializeBoard());
+    setCurrentPlayer("green");
   }
 
   return (
     <Box p={4}>
+      <Text fontSize="2xl" fontWeight="bold" mb={4}>
+        Current Player: {currentPlayer}
+      </Text>
       <Grid templateColumns={`repeat(${BOARD_SIZE}, 1fr)`} gap={1} width={isLargerThan600 ? "500px" : "100%"} mx="auto">
         {board.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
@@ -107,6 +134,9 @@ const Index = () => {
           )),
         )}
       </Grid>
+      <Button mt={4} onClick={resetGame}>
+        New Game
+      </Button>
     </Box>
   );
 };
